@@ -58,3 +58,16 @@ def test_extract_level_unknown():
 
 def test_extract_level_missing():
     assert extract_level({}) is None
+
+
+@pytest.mark.parametrize("level,expected", [
+    ("debug", "debug"),
+    ("info", "info"),
+    ("warning", "warning"),
+    ("error", "error"),
+    ("critical", "critical"),
+])
+def test_extract_level_all_known_levels(level, expected):
+    """Verify extract_level returns the correct value for each known log level."""
+    parsed = {"level": level, "message": "test"}
+    assert extract_level(parsed) == expected
