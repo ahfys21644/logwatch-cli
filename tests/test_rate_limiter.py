@@ -73,3 +73,17 @@ def test_summary_contains_fired_rules(limiter):
     s = limiter.summary()
     assert "error_rule" in s
     assert s["error_rule"]["suppressed"] == 1
+
+
+def test_summary_empty_when_no_alerts_fired(limiter):
+    s = limiter.summary()
+    assert s == {}
+
+
+def test_summary_multiple_rules(limiter):
+    limiter.allow("rule_a")
+    limiter.allow("rule_a")
+    limiter.allow("rule_b")
+    s = limiter.summary()
+    assert s["rule_a"]["suppressed"] == 1
+    assert s["rule_b"]["suppressed"] == 0
