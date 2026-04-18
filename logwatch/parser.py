@@ -42,6 +42,18 @@ def parse_line(line: str) -> dict:
     return {"message": line, "level": "unknown"}
 
 
+def parse_lines(lines) -> list[dict]:
+    """Parse multiple log lines, skipping empty results.
+
+    Args:
+        lines: An iterable of log line strings.
+
+    Returns:
+        A list of non-empty parsed log entry dicts.
+    """
+    return [parsed for line in lines if (parsed := parse_line(line))]
+
+
 def _normalize(data: dict) -> None:
     """Normalize common field aliases in-place."""
     # Normalize level field
