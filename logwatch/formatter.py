@@ -59,3 +59,23 @@ def format_alert(rule_name: str, entry: Dict[str, Any], color: bool = True) -> s
     if color:
         label = f"\033[41m{BOLD}{label}{RESET}"
     return f"{label}  {format_entry(entry, color=color, show_fields=False)}"
+
+
+def format_summary(counts: Dict[str, int], color: bool = True) -> str:
+    """Format a summary line showing log entry counts per level.
+
+    Args:
+        counts: Mapping of level name to number of entries seen.
+        color:  Whether to apply ANSI color codes.
+
+    Returns:
+        A single-line summary string, e.g. ``INFO: 42  WARN: 3  ERROR: 1``.
+    """
+    parts = []
+    for level, count in counts.items():
+        label = f"{level.upper()}: {count}"
+        if color:
+            color_code = LEVEL_COLORS.get(level.lower(), "")
+            label = f"{color_code}{BOLD}{label}{RESET}"
+        parts.append(label)
+    return "  ".join(parts)
