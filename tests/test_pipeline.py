@@ -69,3 +69,19 @@ def test_build_pipeline_writes_to_file(tmp_path, info_entry, capsys):
 def test_pipeline_empty_entries(sink, capsys):
     stats = run_pipeline(iter([]), [], [], sink)
     assert stats == {"total": 0, "passed": 0, "alerts": 0}
+
+
+def test_pipeline_multiple_rules_trigger_independently(sink, error_entry, capsys):
+    """Each matching alert rule should be counted and trigger its own callback."""
+    rule_a = AlertRule(name="rule-a", level_threshold="ERROR")
+    rule_b = AlertRule(name="rule-b", level_threshold="ERROR")
+    triggered = []
+    stats = run_pipeline(
+        iter([error_entry]),
+        [],
+        [rule_a, rule_b],
+        sink,
+        on_alert=lambda r, e: triggered.append(r.name),
+    )
+    assert stats["alerts"] == 2
+    assert triggered == ["rule-a", "rule-b"]
