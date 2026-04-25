@@ -53,6 +53,14 @@ def test_load_corrupt_file_returns_zero(cp_dir: Path) -> None:
     assert load_checkpoint("/var/log/app.log", cp_dir) == 0
 
 
+def test_load_missing_offset_key_returns_zero(cp_dir: Path) -> None:
+    """A valid JSON file that lacks the 'offset' key should return 0."""
+    cp_dir.mkdir(parents=True)
+    bad = cp_dir / "var_log_app.log.json"
+    bad.write_text(json.dumps({"path": "/var/log/app.log"}))
+    assert load_checkpoint("/var/log/app.log", cp_dir) == 0
+
+
 def test_delete_removes_file(cp_dir: Path) -> None:
     save_checkpoint("/var/log/app.log", 100, cp_dir)
     result = delete_checkpoint("/var/log/app.log", cp_dir)
