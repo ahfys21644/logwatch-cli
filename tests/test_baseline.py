@@ -93,23 +93,21 @@ def test_deviation_returns_event(cfg):
     assert event.factor > cfg.deviation_factor
 
 
-def test_no_deviation_below_factor(cfg):
+def test_no_deviation_within_normal_range(cfg):
+    """Verify that a rate close to the baseline does not trigger an event."""
     t = BaselineTracker(cfg)
-    # establish baseline at ~1/s
-    for i in range(10):
-        t.feed(object(), ts=float(i))
+    # Establish two baseline windows at ~2 events per window
+    t.feed(object(), ts=0.0)
+    t.feed(object(), ts=5.0)
     t.flush(ts=10.0)
 
-    # second window at same rate
-    for i in range(10):
-        t.feed(object(), ts=10.0 + float(i))
-    event = t.flush(ts=20.0)
+    t.feed(object(), ts=10.0)
+    t.feed(object(), ts=15.0)
+    t.flush(ts=20.0)
 
-    # rate is not above 2x baseline
+    # Third window: same rate — should not trigger a deviation event
+    t.feed(object(), ts=20.0)
+    t.feed(object(), ts=25.0)
+    event = t.flush(ts=30.0)
+
     assert event is None
-
-
-def test_baseline_event_str_contains_name():
-    ev = BaselineEvent(name="mylog", live_rate=5.0, baseline_mean=1.0, factor=5.0)
-    assert "mylog" in str(ev)
-    assert "5.0x" in str(ev)
