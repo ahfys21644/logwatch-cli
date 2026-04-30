@@ -23,7 +23,20 @@ def routing_sink(router: Router, entries: Iterable[dict]) -> None:
 
 
 def make_level_splitter(low_sink, high_sink, threshold: str = "error"):
-    """Return a simple two-way router that splits on level threshold."""
+    """Return a simple two-way router that splits on level threshold.
+
+    Entries at or above *threshold* are dispatched to *high_sink*; all
+    other entries fall through to *low_sink* (the router's default sink).
+
+    Args:
+        low_sink:  Sink that receives entries below the threshold.
+        high_sink: Sink that receives entries at or above the threshold.
+        threshold: Minimum level string that routes to *high_sink*
+                   (default: ``"error"``).
+
+    Returns:
+        A configured :class:`~logwatch.router.Router` instance.
+    """
     from logwatch.router import RouteRule, Router
     from logwatch.filter import filter_by_level
 
